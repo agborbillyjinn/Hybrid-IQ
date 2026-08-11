@@ -136,7 +136,7 @@ export default function AccountDetail() {
 
       {/* Tab content */}
       <div className="p-8 bg-slate-50 min-h-[60vh]">
-        {tab === "Overview" && <OverviewTab account={account} intel={intel} />}
+        {tab === "Overview" && <OverviewTab account={account} intel={intel} onNavigateTab={setTab} />}
         {tab === "ERP Estate" && <ERPEstateTab intel={intel} />}
         {tab === "ERP Intelligence" && <ERPIntelligenceTab account={account} intel={intel} />}
         {tab === "Transformation Signals" && <SignalsTab intel={intel} accountId={account.id} />}

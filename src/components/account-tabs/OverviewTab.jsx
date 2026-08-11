@@ -1,83 +1,41 @@
 import React from "react";
-import ScoreGauge from "@/components/intelligence/ScoreGauge";
 import SectionCard from "@/components/intelligence/SectionCard";
-import { ConfidenceBadge } from "@/components/intelligence/Badges";
-import { formatCurrency } from "@/lib/format";
+import ScoreExplanations from "@/components/account-tabs/overview/ScoreExplanations";
+import ERPEvidenceSummary from "@/components/account-tabs/overview/ERPEvidenceSummary";
+import TransformationEconomics from "@/components/account-tabs/overview/TransformationEconomics";
+import CriticalResearchGap from "@/components/account-tabs/overview/CriticalResearchGap";
+import ScoreRelationship from "@/components/account-tabs/overview/ScoreRelationship";
+import EvidenceHealth from "@/components/account-tabs/overview/EvidenceHealth";
 import { Target, TrendingUp, Zap, Layers, AlertCircle, Lightbulb, Compass } from "lucide-react";
 
-export default function OverviewTab({ account, intel }) {
-  const s = intel.scores || {};
-  const tp = s.transformation_probability || {};
-  const target = intel.target_erp || {};
+export default function OverviewTab({ account, intel, onNavigateTab }) {
   const attack = intel.attack_plan || {};
 
   return (
     <div className="space-y-5">
+      {/* Scoring Summary with dynamic explanations */}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
         <h3 className="text-sm font-semibold text-slate-900 mb-1">Scoring Summary</h3>
         <p className="text-xs text-slate-400 mb-5">Four independent models. All scores are AI estimates with evidence-backed confidence.</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
-          <ScoreGauge label="Transformation Probability" value={tp.value} subtitle="Likelihood of ERP transformation" />
-          <ScoreGauge label="Hybrid Fit" value={s.hybrid_fit?.value} type="fit" subtitle="Current BC offering suitability" />
-          <ScoreGauge label="Future Enterprise Fit" value={s.future_enterprise_fit?.value} type="fit" subtitle="SAP / Oracle / NetSuite / F&O" />
-          <ScoreGauge label="Migration Complexity" value={s.migration_complexity?.value} subtitle="Difficulty of transformation" />
-        </div>
+        <ScoreExplanations scores={intel.scores || {}} />
       </div>
 
+      {/* Critical Research Gap | ERP Evidence */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <SectionCard title="Transformation Probability Breakdown">
-          <div className="space-y-3">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-              <div>
-                <div className="text-xs font-medium text-slate-500 uppercase">Biggest Unknown</div>
-                <p className="text-sm text-slate-700 mt-0.5">{tp.biggest_unknown || "Not determined"}</p>
-              </div>
-            </div>
-            <div>
-              <div className="text-xs font-medium text-slate-500 uppercase mb-2">Top Reasons</div>
-              <ul className="space-y-1.5">
-                {(tp.reasons || []).map((r, i) => (
-                  <li key={i} className="text-sm text-slate-700 flex items-start gap-2"><span className="text-indigo-500 mt-0.5">•</span>{r}</li>
-                ))}
-                {(tp.reasons || []).length === 0 && <li className="text-sm text-slate-400">No reasons provided.</li>}
-              </ul>
-            </div>
-            <div className="flex items-start gap-2 pt-2 border-t border-slate-100">
-              <Compass className="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" />
-              <div>
-                <div className="text-xs font-medium text-slate-500 uppercase">Recommended Next Research Action</div>
-                <p className="text-sm text-slate-700 mt-0.5">{tp.next_action || "—"}</p>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Target ERP / Next Move">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-lg bg-slate-50 p-4">
-              <div className="text-xs text-slate-400 uppercase">Current</div>
-              <div className="text-base font-semibold text-slate-800 mt-1">{target.current_erp || account.current_erp || "Unknown"}</div>
-            </div>
-            <div className="rounded-lg bg-indigo-50 p-4">
-              <div className="text-xs text-indigo-400 uppercase">Likely Target</div>
-              <div className="text-base font-semibold text-indigo-700 mt-1">{target.next_erp || "—"}</div>
-            </div>
-          </div>
-          <div className="mt-4">
-            <div className="flex items-center justify-between text-sm mb-1.5">
-              <span className="text-slate-500">Migration Probability</span>
-              <span className="font-semibold text-slate-800">{target.probability || 0}%</span>
-            </div>
-            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full" style={{ width: `${target.probability || 0}%` }} />
-            </div>
-            <div className="text-xs text-slate-400 mt-1.5">Type: {target.migration_type || "—"}</div>
-          </div>
-          {target.why && <p className="text-sm text-slate-600 mt-3 leading-relaxed">{target.why}</p>}
-        </SectionCard>
+        <CriticalResearchGap intel={intel} account={account} />
+        <ERPEvidenceSummary intel={intel} account={account} onViewEvidence={() => onNavigateTab?.("Evidence")} />
       </div>
 
+      {/* Transformation Economics */}
+      <TransformationEconomics intel={intel} onViewCommercial={() => onNavigateTab?.("Commercial Model")} />
+
+      {/* Score Relationship | Evidence Health */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <ScoreRelationship intel={intel} />
+        <EvidenceHealth intel={intel} />
+      </div>
+
+      {/* Account Attack Plan (preserved) */}
       <SectionCard title="Account Attack Plan" subtitle="Hypothesis-driven — validate before acting">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
           <Field icon={Target} label="Account Priority" value={attack.account_priority} />
