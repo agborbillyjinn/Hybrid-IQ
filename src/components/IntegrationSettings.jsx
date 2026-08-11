@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plug, Save, Check, Lock } from "lucide-react";
+import { Loader2, Plug, Save, Check, Lock, FlaskConical } from "lucide-react";
 
 const PROVIDERS = [
   { key: "n8n", label: "n8n Workflow", desc: "Webhook URL to trigger external research orchestration", hasWebhook: true },
@@ -62,6 +62,24 @@ export default function IntegrationSettings() {
       <div className="flex items-center gap-2 mb-4 text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
         <Lock className="w-3.5 h-3.5 text-slate-400" />
         No single provider is required. The built-in LLM engine runs when no external workflow is configured.
+      </div>
+      <div className="border border-violet-200 bg-violet-50/50 rounded-lg p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <FlaskConical className="w-4 h-4 text-violet-600" />
+            <div>
+              <div className="text-sm font-semibold text-slate-900">Mock Analysis Mode</div>
+              <div className="text-xs text-slate-500">Run the full orchestration with realistic test data — no external API or n8n required</div>
+            </div>
+          </div>
+          <Switch checked={!!(configs["mock"] || {}).enabled} onCheckedChange={(v) => update("mock", "enabled", v)} />
+        </div>
+        <div className="flex justify-end mt-3">
+          <Button size="sm" variant="outline" onClick={() => save({ key: "mock" })} disabled={saving === "mock"}>
+            {saving === "mock" ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : saved === "mock" ? <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
+            {saved === "mock" ? "Saved" : "Save"}
+          </Button>
+        </div>
       </div>
       <div className="space-y-4">
         {PROVIDERS.map((p) => {

@@ -14,8 +14,9 @@ import BuyingCommitteeTab from "@/components/account-tabs/BuyingCommitteeTab";
 import MeddpiccTab from "@/components/account-tabs/MeddpiccTab";
 import OutreachTab from "@/components/account-tabs/OutreachTab";
 import EvidenceTab from "@/components/account-tabs/EvidenceTab";
+import DebugTab from "@/components/account-tabs/DebugTab";
 
-const TABS = ["Overview", "ERP Estate", "ERP Intelligence", "Transformation Signals", "Migration Complexity", "Commercial Model", "Buying Committee", "MEDDPICC", "Outreach", "Evidence"];
+const TABS = ["Overview", "ERP Estate", "ERP Intelligence", "Transformation Signals", "Migration Complexity", "Commercial Model", "Buying Committee", "MEDDPICC", "Outreach", "Evidence", "Debug"];
 
 export default function AccountDetail() {
   const { id } = useParams();
@@ -92,6 +93,9 @@ export default function AccountDetail() {
                 <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">{account.company_name}</h1>
                 <TierBadge value={account.account_priority} />
                 <PriorityBadge value={account.priority} />
+                {account.source_provider === "mock" && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-violet-100 text-violet-700 border border-violet-200">MOCK ANALYSIS</span>
+                )}
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-slate-500">
                 {co.website && <span className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" />{co.website}</span>}
@@ -142,6 +146,7 @@ export default function AccountDetail() {
         {tab === "MEDDPICC" && <MeddpiccTab account={account} onUpdate={updateAccount} />}
         {tab === "Outreach" && <OutreachTab account={account} intel={intel} />}
         {tab === "Evidence" && <EvidenceTab account={account} intel={intel} />}
+        {tab === "Debug" && <DebugTab account={account} />}
       </div>
     </div>
   );

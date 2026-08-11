@@ -61,7 +61,7 @@ export default function AnalyseAccount() {
       clearInterval(timerRef.current);
       setStage("complete");
 
-      const account = await createAccountFromIntelligence(form, intelligence);
+      const account = await createAccountFromIntelligence(form, intelligence, data.analysis_id);
       await persistChildren(account.id, form.company_name, intelligence);
       navigate(`/accounts/${account.id}`);
     } catch (e) {
@@ -184,7 +184,7 @@ async function waitForJob(analysisId, setStage) {
   });
 }
 
-async function createAccountFromIntelligence(form, intel) {
+async function createAccountFromIntelligence(form, intel, analysisId) {
   const scores = intel.scores || {};
   const cm = intel.commercial_model || {};
   const tradCost = (cm.traditional || {}).cost || {};
@@ -218,6 +218,8 @@ async function createAccountFromIntelligence(form, intel) {
     current_erp: intel.erp_estate?.current_erp_product?.value || form.known_erp,
     target_erp: intel.target_erp?.next_erp || intel.target_erp?.product,
     saved: false,
+    source_provider: intel.source_provider || "builtin-llm",
+    analysis_id: analysisId,
     intelligence: intel,
   });
 }

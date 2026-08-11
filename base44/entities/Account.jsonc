@@ -106,6 +106,12 @@
     },
     "intelligence": {
       "type": "object"
+    },
+    "analysis_id": {
+      "type": "string"
+    },
+    "source_provider": {
+      "type": "string"
     }
   },
   "required": [
