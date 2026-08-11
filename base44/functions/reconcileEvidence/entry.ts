@@ -66,13 +66,11 @@ export default async function(req: Request): Promise<Response> {
     // Persist version snapshot
     if (account_id) {
       const snapshot = createVersionSnapshot(intel, reconciliation, analysis_id || "", account_id, company_name || "", version);
-      try {
-        await base44.asServiceRole.entities.AnalysisVersion.create({
-          ...snapshot,
-          research_gaps_count: reconciliation.research_gaps.length,
-          trigger_reason: trigger_reason || "initial_analysis",
-        });
-      } catch (e) {}
+      await base44.asServiceRole.entities.AnalysisVersion.create({
+        ...snapshot,
+        research_gaps_count: reconciliation.research_gaps.length,
+        trigger_reason: trigger_reason || "initial_analysis",
+      });
     }
 
     return Response.json({ reconciliation, version });
