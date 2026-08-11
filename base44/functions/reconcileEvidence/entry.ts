@@ -14,11 +14,14 @@ export default async function(req: Request): Promise<Response> {
     const { account_id, company_name, intelligence, evidence_list, analysis_id, trigger_reason } = body;
     if (!account_id && !intelligence) return Response.json({ error: "account_id or intelligence is required" }, { status: 400 });
 
-    // Gather evidence: explicit list > DB query by account_id
+    // Gather evidence: explicit list > DB query by account_id > intelligence.evidence
     let rawEvidence = evidence_list;
     let intel = intelligence;
     if (!rawEvidence && account_id) {
       rawEvidence = await base44.asServiceRole.entities.Evidence.filter({ account_id });
+    }
+    if ((!rawEvidence || rawEvidence.length === 0) && intel?.evidence?.length) {
+      rawEvidence = intel.evidence;
     }
     if (!intel && account_id) {
       const accounts = await base44.asServiceRole.entities.Account.filter({ id: account_id });
