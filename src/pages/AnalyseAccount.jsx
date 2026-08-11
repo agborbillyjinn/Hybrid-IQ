@@ -114,6 +114,17 @@ export default function AnalyseAccount() {
               <SelectContent>{ERP_SYSTEMS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
             </Select>
           </div>
+          <div>
+            <Label className="text-xs font-medium text-slate-600">Research Mode</Label>
+            <Select value={form.research_mode || ""} onValueChange={(v) => set("research_mode", v)}>
+              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Use default (from settings)" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MOCK">MOCK — test data</SelectItem>
+                <SelectItem value="LIVE">LIVE — external job sources</SelectItem>
+                <SelectItem value="HYBRID">HYBRID — live + AI inference</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="md:col-span-2">
             <Label className="text-xs font-medium text-slate-600">Notes</Label>
             <Textarea
@@ -282,6 +293,8 @@ async function persistChildren(accountId, companyName, intel) {
           salary_low: v.salary_low, salary_high: v.salary_high,
           contract_rate_low: v.contract_rate_low, contract_rate_high: v.contract_rate_high,
           currency: v.currency, advertised_compensation: v.advertised_compensation,
+          compensation_type: v.compensation_type, market_rate_low: v.market_rate_low, market_rate_high: v.market_rate_high,
+          market_rate_confidence: v.market_rate_confidence, assumption_source: v.assumption_source,
           erp_vendor: v.erp_vendor, erp_product: v.erp_product, erp_version: v.erp_version,
           erp_modules: (v.erp_modules || []).join(", "),
           technical_skills: (v.technical_skills || []).join(", "),
@@ -291,10 +304,34 @@ async function persistChildren(accountId, companyName, intel) {
           programme_language: v.programme_language, migration_language: v.migration_language,
           transformation_language: v.transformation_language, implementation_language: v.implementation_language,
           support_language: v.support_language, greenfield_brownfield: v.greenfield_brownfield,
-          source: v.source, source_url: v.source_url, evidence_confidence: v.evidence_confidence,
-          classification: v.classification,
+          source: v.source, source_url: v.source_url, source_quality: v.source_quality,
+          raw_text_reference: v.raw_text_reference, search_query: v.search_query, canonical_url: v.canonical_url,
+          dedup_hash: v.dedup_hash, technology_role: v.technology_role, programme_stage_signal: v.programme_stage_signal,
+          llm_inferred: v.llm_inferred, evidence_confidence: v.evidence_confidence, classification: v.classification,
         }))
       );
+      // Create Evidence records for live vacancies (mock already carries its own evidence)
+      if (intel.source_provider !== "mock") {
+        await base44.entities.Evidence.bulkCreate(
+          intel.job_vacancies.map((v) => ({
+            account_id: accountId, company: companyName,
+            finding: `${v.job_title} — ${v.erp_product || "ERP"} vacancy (${v.status})`,
+            erp: v.erp_product, erp_vendor: v.erp_vendor, erp_product: v.erp_product, erp_version: v.erp_version,
+            date: v.date_posted, evidence_date: v.date_posted, date_found: v.date_first_detected,
+            source_type: v.status === "HISTORICAL" ? "Historic Job Vacancy" : "Current Job Vacancy",
+            source_name: v.source, source_url: v.source_url,
+            evidence_extract: (v.raw_text_reference || v.responsibilities || "").slice(0, 500),
+            evidence_summary: `${v.job_title} at ${companyName} (${v.employment_type || "Unknown"})`,
+            confidence: (v.evidence_confidence || 0) >= 80 ? "HIGHLY LIKELY" : (v.evidence_confidence || 0) >= 60 ? "INFERRED" : "UNKNOWN",
+            status: (v.evidence_confidence || 0) >= 80 ? "HIGHLY LIKELY" : "INFERRED",
+            evidence_strength: "STRONG",
+            confidence_score: v.evidence_confidence,
+            current_or_historical: v.status === "HISTORICAL" ? "HISTORICAL" : "CURRENT",
+            last_checked: new Date().toISOString(),
+            supported_fields: "job_vacancy,hiring_intelligence",
+          }))
+        );
+      }
     }
   } catch (e) {
     // non-critical

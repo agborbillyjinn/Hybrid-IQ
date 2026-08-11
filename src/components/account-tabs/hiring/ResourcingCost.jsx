@@ -10,7 +10,7 @@ export default function ResourcingCost({ hi }) {
     <SectionCard title="Resourcing Cost Model" subtitle="Estimated internal & external ERP resourcing requirements">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <div className="text-[10px] font-semibold text-slate-400 uppercase mb-2">Advertised Compensation</div>
+          <div className="text-[10px] font-semibold text-emerald-600 uppercase mb-2">Actual Advertised Rate</div>
           <div className="space-y-1.5">
             {r.advertised?.length ? r.advertised.map((a, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
@@ -27,7 +27,8 @@ export default function ResourcingCost({ hi }) {
           <div className="text-sm text-slate-700 mt-1">Consulting requirement (gaps): <strong>{r.consulting_requirement}</strong></div>
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+      <div className="text-[10px] font-semibold text-amber-600 uppercase mb-2">Estimated Market Range (rate card assumptions — not advertised)</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Cost label="Permanent Staff Cost (incl. on-costs)" range={r.permanent_staff_cost} fmt={fmt} />
         <Cost label="Estimated Contractor Spend" range={r.estimated_contractor_spend} fmt={fmt} />
         <Cost label="Estimated Consulting Spend" range={r.estimated_consulting_spend} fmt={fmt} />

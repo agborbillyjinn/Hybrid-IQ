@@ -23,6 +23,10 @@
         "modelling_cost",
         "mapping_committee",
         "creating_gtm",
+        "searching_erp_vacancies",
+        "analysing_hiring_signals",
+        "inferring_programme_stage",
+        "estimating_consulting_demand",
         "complete",
         "failed"
       ],
@@ -63,6 +67,17 @@
     },
     "error": {
       "type": "string"
+    },
+    "research_mode": {
+      "type": "string",
+      "enum": [
+        "MOCK",
+        "LIVE",
+        "HYBRID"
+      ]
+    },
+    "research_metadata": {
+      "type": "object"
     }
   },
   "required": [

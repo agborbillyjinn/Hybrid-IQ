@@ -63,6 +63,27 @@
     "advertised_compensation": {
       "type": "string"
     },
+    "compensation_type": {
+      "type": "string",
+      "enum": [
+        "ADVERTISED",
+        "ESTIMATED",
+        "NONE"
+      ],
+      "default": "NONE"
+    },
+    "market_rate_low": {
+      "type": "number"
+    },
+    "market_rate_high": {
+      "type": "number"
+    },
+    "market_rate_confidence": {
+      "type": "string"
+    },
+    "assumption_source": {
+      "type": "string"
+    },
     "erp_vendor": {
       "type": "string"
     },
@@ -110,6 +131,30 @@
     },
     "source_url": {
       "type": "string"
+    },
+    "source_quality": {
+      "type": "number"
+    },
+    "raw_text_reference": {
+      "type": "string"
+    },
+    "search_query": {
+      "type": "string"
+    },
+    "canonical_url": {
+      "type": "string"
+    },
+    "dedup_hash": {
+      "type": "string"
+    },
+    "technology_role": {
+      "type": "string"
+    },
+    "programme_stage_signal": {
+      "type": "string"
+    },
+    "llm_inferred": {
+      "type": "boolean"
     },
     "evidence_confidence": {
       "type": "number"

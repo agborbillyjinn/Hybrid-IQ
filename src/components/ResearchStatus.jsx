@@ -10,6 +10,10 @@ export const STAGES = [
   { key: "modelling_cost", label: "Modelling Cost & Time" },
   { key: "mapping_committee", label: "Mapping Buying Committee" },
   { key: "creating_gtm", label: "Creating GTM Strategy" },
+  { key: "searching_erp_vacancies", label: "Searching ERP Vacancies" },
+  { key: "analysing_hiring_signals", label: "Analysing Hiring Signals" },
+  { key: "inferring_programme_stage", label: "Inferring Programme Stage" },
+  { key: "estimating_consulting_demand", label: "Estimating Consulting Demand" },
   { key: "complete", label: "Analysis Complete" },
 ];
 

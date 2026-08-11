@@ -223,9 +223,19 @@ function buildResourcing(vacs: any[], active: any[], gapCount: number) {
   const contractorSpend = contract.length * avgDayRate * 180;
   const consultingSpend = gapCount * avgDayRate * 180;
   const total = permOnCost + contractorSpend + consultingSpend;
+  const estimated = active.filter((v) => !v.advertised_compensation);
   return {
     advertised,
-    estimated_market: active.map((v) => ({ role: v.job_title, low: Math.round(estimateSalary(v.job_title) * 0.9), high: Math.round(estimateSalary(v.job_title) * 1.1), currency: "GBP" })),
+    advertised_count: advertised.length,
+    estimated_market: active.map((v) => ({
+      role: v.job_title,
+      low: Math.round(estimateSalary(v.job_title) * 0.9),
+      high: Math.round(estimateSalary(v.job_title) * 1.1),
+      currency: "GBP",
+      compensation_type: v.compensation_type || (v.advertised_compensation ? "ADVERTISED" : "ESTIMATED"),
+      assumption_source: v.advertised_compensation ? "ADVERTISED" : "ESTIMATED MARKET RANGE (rate card assumption)",
+    })),
+    estimated_count: estimated.length,
     likely_roles: unique(active.map((v) => v.job_title)),
     estimated_fte: estFte,
     permanent_staff_cost: band(permOnCost),
@@ -234,7 +244,7 @@ function buildResourcing(vacs: any[], active: any[], gapCount: number) {
     estimated_contractor_spend: band(contractorSpend),
     estimated_consulting_spend: band(consultingSpend),
     estimated_total_resourcing: band(total),
-    note: "Estimated market compensation uses configurable assumptions — not factual rates unless advertised.",
+    note: "Advertised rates are factual. Estimated market ranges use configurable rate-card assumptions — not factual unless labelled ADVERTISED.",
   };
 }
 
@@ -370,6 +380,8 @@ export function analyzeHiringIntelligence(vacancies: any[], ctx: any = {}) {
   let bestScore = 0;
   for (const [stage, score] of Object.entries(stageScores)) if (score > bestScore) { bestScore = score; bestStage = stage; }
   const stageConfidence = bestScore >= 8 ? "HIGH" : bestScore >= 4 ? "MEDIUM" : "LOW";
+  const stageSupportingRoles = vacs.filter((v) => (STAGE_VOTES[v._classification] || {})[bestStage]).map((v) => ({ classification: v._classification, job_title: v.job_title }));
+  const stageConflicting = Object.entries(stageScores).filter(([s]) => s !== bestStage && s !== "NO TRANSFORMATION DETECTED").sort((a, b) => b[1] - a[1]).slice(0, 3).map(([stage, score]) => ({ stage, score }));
 
   const techBuckets: Record<string, Record<string, number>> = { CURRENT: {}, TARGET: {}, LEGACY: {}, INTEGRATION: {}, EXPERIENCE: {}, UNCLEAR: {} };
   for (const v of vacs) {
@@ -444,6 +456,9 @@ export function analyzeHiringIntelligence(vacancies: any[], ctx: any = {}) {
     likely_programme_stage: bestStage,
     programme_stage_confidence: stageConfidence,
     programme_stage_reasoning: buildStageReasoning(bestStage, classificationCounts),
+    programme_stage_evidence_count: stageSupportingRoles.length,
+    programme_stage_supporting_roles: stageSupportingRoles,
+    programme_stage_conflicting_evidence: stageConflicting,
     consulting_demand_score: consultingDemandScore.score,
     consulting_demand_level: consultingDemandScore.level,
     consulting_demand_reasons: consultingDemandScore.reasons,

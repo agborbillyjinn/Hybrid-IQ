@@ -31,6 +31,8 @@ export default async function(req: Request): Promise<Response> {
       confidence: body.confidence || "CONFIRMED",
       evidence_type: body.evidence_type || "external_research",
       research_sources: Array.isArray(body.research_sources) ? body.research_sources.join(", ") : (body.research_sources || ""),
+      research_mode: body.research_mode || body.research_metadata?.research_mode || null,
+      research_metadata: body.research_metadata || intelligence.research_metadata || null,
     });
 
     return Response.json({ status: "complete", analysis_id: analysisId });

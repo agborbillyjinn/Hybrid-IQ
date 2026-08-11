@@ -52,6 +52,7 @@ export function normalizeIntelligence(body) {
     scores: { ...(body.scores || {}), ...scores },
     job_vacancies: body.job_vacancies || [],
     hiring_intelligence: hiring,
+    research_metadata: body.research_metadata || null,
     source_provider: body.source_provider,
   };
 }

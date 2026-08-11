@@ -41,7 +41,33 @@ export default function DebugTab({ account }) {
         <Field label="Evidence Type" value={job.evidence_type} />
         <Field label="Confidence" value={job.confidence} />
         <Field label="Research Sources" value={job.research_sources} />
+        <Field label="Research Mode" value={job.research_mode} />
       </div>
+      {job.intelligence?.research_metadata && (
+        <div className="mt-4">
+          <div className="text-xs font-semibold text-slate-500 uppercase mb-2 flex items-center gap-1.5"><Bug className="w-3.5 h-3.5" /> Hiring Research Audit</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="Research Mode" value={job.intelligence.research_metadata.research_mode} />
+            <Field label="Last Job Search" value={fmtTime(job.intelligence.research_metadata.last_job_search)} />
+            <Field label="Vacancies Found" value={job.intelligence.research_metadata.vacancies_found} />
+            <Field label="Duplicates Removed" value={job.intelligence.research_metadata.duplicates_removed} />
+            <Field label="Vacancies Persisted" value={job.intelligence.research_metadata.vacancies_persisted} />
+            <Field label="LLM Calls" value={job.intelligence.research_metadata.llm_calls} />
+            <Field label="Duration (ms)" value={job.intelligence.research_metadata.duration_ms} />
+            <Field label="Coverage Confidence" value={job.intelligence.research_metadata.coverage_confidence} />
+            <Field label="Sources Checked" value={(job.intelligence.research_metadata.sources_checked || []).join(", ")} />
+            <Field label="Search Queries" value={(job.intelligence.research_metadata.search_queries || []).join(" | ")} />
+          </div>
+          {job.intelligence.research_metadata.errors?.length > 0 && (
+            <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
+              <div className="text-xs font-semibold text-amber-600 uppercase mb-1">Research Errors</div>
+              <ul className="text-sm text-amber-700 list-disc list-inside">
+                {job.intelligence.research_metadata.errors.map((e, i) => <li key={i}>{e}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
       {job.error && (
         <div className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />

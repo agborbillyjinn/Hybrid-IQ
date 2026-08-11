@@ -273,6 +273,26 @@ export function buildMockPayload(companyName, analysisId) {
       follow_up: "Hi [First Name],\n\nFollowing up on my note about Northstar's NAV 2018 migration. With support ending soon, I imagine timing is front of mind.\n\nHappy to share a quick illustration of how our AI-assisted approach compresses the C/Side-to-AL rewrite and data migration. Any interest in a brief call?\n\nBest,\n[Your Name]",
     },
     job_vacancies: buildMockVacancies(),
+    research_metadata: {
+      research_mode: "MOCK",
+      search_queries: [
+        "[Northstar Manufacturing] Dynamics 365 jobs",
+        "[Northstar Manufacturing] Business Central",
+        "[Northstar Manufacturing] ERP transformation",
+        "[Northstar Manufacturing] data migration",
+        "[Northstar Manufacturing] ERP contractor",
+      ],
+      sources_checked: ["Mock Job Board", "Mock Company Careers Page", "Mock LinkedIn Jobs"],
+      vacancies_found: 20,
+      duplicates_removed: 3,
+      vacancies_persisted: 17,
+      llm_calls: 0,
+      errors: [],
+      duration_ms: 0,
+      analysis_version: "1.1",
+      last_job_search: new Date().toISOString(),
+      coverage_confidence: "HIGH",
+    },
   };
 }
 

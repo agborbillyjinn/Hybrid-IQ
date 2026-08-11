@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Plug, Save, Check, Lock, FlaskConical } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Plug, Save, Check, Lock, FlaskConical, Briefcase } from "lucide-react";
 
 const PROVIDERS = [
   { key: "n8n", label: "n8n Workflow", desc: "Webhook URL to trigger external research orchestration", hasWebhook: true },
@@ -78,6 +79,38 @@ export default function IntegrationSettings() {
           <Button size="sm" variant="outline" onClick={() => save({ key: "mock" })} disabled={saving === "mock"}>
             {saving === "mock" ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : saved === "mock" ? <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
             {saved === "mock" ? "Saved" : "Save"}
+          </Button>
+        </div>
+      </div>
+      <div className="border border-indigo-200 bg-indigo-50/50 rounded-lg p-4 mb-4">
+        <div className="flex items-center gap-2.5 mb-3">
+          <Briefcase className="w-4 h-4 text-indigo-600" />
+          <div>
+            <div className="text-sm font-semibold text-slate-900">ERP Job Discovery Mode</div>
+            <div className="text-xs text-slate-500">MOCK uses test data · LIVE uses external job sources · HYBRID supplements missing fields with AI inference</div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <Label className="text-xs text-slate-500">Research Mode</Label>
+            <Select value={(configs["jobs_research"] || {}).notes || "MOCK"} onValueChange={(v) => update("jobs_research", "notes", v)}>
+              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MOCK">MOCK — test data</SelectItem>
+                <SelectItem value="LIVE">LIVE — external job sources</SelectItem>
+                <SelectItem value="HYBRID">HYBRID — live + AI inference</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs text-slate-500">n8n Job Research Webhook (optional)</Label>
+            <Input value={(configs["jobs_research"] || {}).webhook_url || ""} onChange={(e) => update("jobs_research", "webhook_url", e.target.value)} placeholder="https://n8n.example.com/webhook/jobs" className="mt-1" />
+          </div>
+        </div>
+        <div className="flex justify-end mt-3">
+          <Button size="sm" variant="outline" onClick={() => save({ key: "jobs_research" })} disabled={saving === "jobs_research"}>
+            {saving === "jobs_research" ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : saved === "jobs_research" ? <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
+            {saved === "jobs_research" ? "Saved" : "Save"}
           </Button>
         </div>
       </div>
