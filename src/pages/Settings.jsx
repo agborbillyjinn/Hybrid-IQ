@@ -2,6 +2,7 @@ import React from "react";
 import SectionCard from "@/components/intelligence/SectionCard";
 import { ERP_SYSTEMS } from "@/lib/erpData";
 import { ShieldCheck, Database, Bot, AlertCircle } from "lucide-react";
+import IntegrationSettings from "@/components/IntegrationSettings";
 
 const WEIGHTS = [
   ["ERP Age", "15%"], ["Legacy ERP Evidence", "15%"], ["ERP Recruitment", "15%"],
@@ -52,6 +53,10 @@ export default function Settings() {
             Reduction is adjusted per account based on how much implementation work appears AI-compressible. Never presented as a guaranteed figure.
           </p>
         </SectionCard>
+      </div>
+
+      <div className="mt-5">
+        <IntegrationSettings />
       </div>
 
       <div className="mt-5 bg-amber-50 border border-amber-200 rounded-xl p-4">

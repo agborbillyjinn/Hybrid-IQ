@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Card } from "@/components/ui/card";
@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Crosshair, Loader2, Sparkles } from "lucide-react";
+import { Crosshair, Sparkles } from "lucide-react";
 import { ERP_SYSTEMS, INDUSTRIES } from "@/lib/erpData";
+import ResearchStatus, { STAGES } from "@/components/ResearchStatus";
 
 const FIELDS = [
   { name: "company_name", label: "Company Name", required: true, placeholder: "e.g. Contoso Manufacturing Ltd" },
@@ -24,6 +25,8 @@ export default function AnalyseAccount() {
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [stage, setStage] = useState("researching_company");
+  const timerRef = useRef(null);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -34,48 +37,35 @@ export default function AnalyseAccount() {
     }
     setLoading(true);
     setError("");
+    setStage("researching_company");
+
+    // Animate through stages while the synchronous built-in analysis runs
+    let stageIdx = 0;
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      stageIdx = Math.min(stageIdx + 1, STAGES.length - 2);
+      setStage(STAGES[stageIdx].key);
+    }, 7000);
+
     try {
-      const res = await base44.functions.invoke("generateAccountIntelligence", form);
-      const intel = res.data.intelligence;
-      const scores = intel.scores || {};
-      const cm = intel.commercial_model || {};
-      const trad = cm.traditional || {};
-      const tradCost = trad.cost || {};
-      const expectedScenario = (cm.hybrid_scenarios || []).find((s) => s.name?.toLowerCase().includes("expected")) || {};
-      const account = await base44.entities.Account.create({
-        company_name: form.company_name,
-        website: form.website,
-        country: form.country,
-        industry: form.industry || intel.company_overview?.industry,
-        known_erp: form.known_erp,
-        estimated_erp_users: num(form.estimated_erp_users),
-        employees: num(form.employees) || intel.company_overview?.employees,
-        revenue: num(form.revenue) || intel.company_overview?.revenue,
-        notes: form.notes,
-        logo_url: intel.company_overview?.logo_url || "",
-        headquarters: intel.company_overview?.headquarters,
-        locations: intel.company_overview?.locations,
-        ownership: intel.company_overview?.ownership,
-        last_analysed: new Date().toISOString(),
-        transformation_probability: scores.transformation_probability?.value,
-        hybrid_fit: scores.hybrid_fit?.value,
-        future_enterprise_fit: scores.future_enterprise_fit?.value,
-        migration_complexity: scores.migration_complexity?.value,
-        estimated_traditional_cost_low: tradCost.low,
-        estimated_traditional_cost_expected: tradCost.expected,
-        estimated_traditional_cost_high: tradCost.high,
-        potential_saving: expectedScenario.saving,
-        estimated_months_saved: expectedScenario.months_saved,
-        priority: derivePriority(scores.transformation_probability?.value, scores.hybrid_fit?.value),
-        primary_trigger: (intel.signals || [])[0]?.signal,
-        current_erp: intel.erp_estate?.current_erp_product?.value || form.known_erp,
-        target_erp: intel.target_erp?.next_erp,
-        saved: false,
-        intelligence: intel,
-      });
-      await persistChildren(account.id, form.company_name, intel);
+      const res = await base44.functions.invoke("startAnalysis", form);
+      const data = res.data || {};
+      let intelligence = data.intelligence;
+
+      if (data.async && !intelligence) {
+        // External n8n workflow — poll the job until it completes
+        clearInterval(timerRef.current);
+        intelligence = await waitForJob(data.analysis_id, setStage);
+      }
+
+      clearInterval(timerRef.current);
+      setStage("complete");
+
+      const account = await createAccountFromIntelligence(form, intelligence);
+      await persistChildren(account.id, form.company_name, intelligence);
       navigate(`/accounts/${account.id}`);
     } catch (e) {
+      clearInterval(timerRef.current);
       setError(e.message || "Analysis failed. Please try again.");
     } finally {
       setLoading(false);
@@ -144,15 +134,92 @@ export default function AnalyseAccount() {
           size="lg"
           className="mt-6 w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
         >
-          {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+          <Sparkles className="w-4 h-4 mr-2" />
           {loading ? "Running account intelligence…" : "Run Account Intelligence"}
         </Button>
-        <p className="text-[11px] text-slate-400 text-center mt-3">
-          AI-generated intelligence distinguishes fact, inference, estimate and hypothesis. Commercial figures are illustrative pre-discovery estimates.
-        </p>
+
+        {loading && (
+          <div className="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <ResearchStatus currentStage={stage} />
+          </div>
+        )}
+
+        {!loading && (
+          <p className="text-[11px] text-slate-400 text-center mt-3">
+            AI-generated intelligence distinguishes fact, inference, estimate and hypothesis. Commercial figures are illustrative pre-discovery estimates.
+          </p>
+        )}
       </Card>
     </div>
   );
+}
+
+async function waitForJob(analysisId, setStage) {
+  let elapsed = 0;
+  return new Promise((resolve, reject) => {
+    const poll = setInterval(async () => {
+      elapsed += 3;
+      if (elapsed > 180) {
+        clearInterval(poll);
+        reject(new Error("Analysis timed out — the external workflow did not return in time."));
+        return;
+      }
+      try {
+        const jobs = await base44.entities.AnalysisJob.filter({ analysis_id: analysisId });
+        const job = jobs[0];
+        if (!job) return;
+        if (job.status === "complete") {
+          clearInterval(poll);
+          resolve(job.intelligence || {});
+        } else if (job.status === "failed") {
+          clearInterval(poll);
+          reject(new Error(job.error || "Analysis failed"));
+        } else if (job.status !== "pending") {
+          setStage(job.status);
+        }
+      } catch (e) {
+        // keep polling
+      }
+    }, 3000);
+  });
+}
+
+async function createAccountFromIntelligence(form, intel) {
+  const scores = intel.scores || {};
+  const cm = intel.commercial_model || {};
+  const tradCost = (cm.traditional || {}).cost || {};
+  const expectedScenario = (cm.hybrid_scenarios || []).find((s) => s.name?.toLowerCase().includes("expected")) || {};
+  return await base44.entities.Account.create({
+    company_name: form.company_name,
+    website: form.website,
+    country: form.country,
+    industry: form.industry || intel.company_overview?.industry,
+    known_erp: form.known_erp,
+    estimated_erp_users: num(form.estimated_erp_users),
+    employees: num(form.employees) || intel.company_overview?.employees,
+    revenue: num(form.revenue) || intel.company_overview?.revenue,
+    notes: form.notes,
+    logo_url: intel.company_overview?.logo_url || "",
+    headquarters: intel.company_overview?.headquarters,
+    locations: intel.company_overview?.locations,
+    ownership: intel.company_overview?.ownership,
+    last_analysed: new Date().toISOString(),
+    transformation_probability: scores.transformation_probability?.value,
+    hybrid_fit: scores.hybrid_fit?.value,
+    future_enterprise_fit: scores.future_enterprise_fit?.value,
+    migration_complexity: scores.migration_complexity?.value,
+    estimated_traditional_cost_low: tradCost.low,
+    estimated_traditional_cost_expected: tradCost.expected,
+    estimated_traditional_cost_high: tradCost.high,
+    potential_saving: expectedScenario.saving,
+    estimated_months_saved: expectedScenario.months_saved,
+    priority: derivePriority(scores.transformation_probability?.value, scores.hybrid_fit?.value),
+    primary_trigger: (intel.signals || [])[0]?.signal,
+    current_erp: intel.erp_estate?.current_erp_product?.value || form.known_erp,
+    target_erp: intel.target_erp?.next_erp || intel.target_erp?.product,
+    saved: false,
+    intelligence: intel,
+  });
 }
 
 function num(v) {
@@ -170,7 +237,6 @@ function derivePriority(prob, fit) {
 
 async function persistChildren(accountId, companyName, intel) {
   try {
-    const now = new Date().toISOString();
     if (intel.evidence?.length) {
       await base44.entities.Evidence.bulkCreate(
         intel.evidence.map((e) => ({
@@ -182,7 +248,7 @@ async function persistChildren(accountId, companyName, intel) {
           confidence: e.confidence, status: e.status || e.confidence,
           evidence_strength: e.evidence_strength, confidence_score: e.confidence_score,
           current_or_historical: e.current_or_historical,
-          last_checked: now, last_verified: e.last_verified, supported_fields: e.supported_fields,
+          last_checked: new Date().toISOString(), last_verified: e.last_verified, supported_fields: e.supported_fields,
         }))
       );
     }
