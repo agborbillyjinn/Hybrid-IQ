@@ -40,7 +40,8 @@ export default function AnalyseAccount() {
       const scores = intel.scores || {};
       const cm = intel.commercial_model || {};
       const trad = cm.traditional || {};
-      const expectedScenario = (cm.ai_scenarios || []).find((s) => s.name?.toLowerCase().includes("expected")) || {};
+      const tradCost = trad.cost || {};
+      const expectedScenario = (cm.hybrid_scenarios || []).find((s) => s.name?.toLowerCase().includes("expected")) || {};
       const account = await base44.entities.Account.create({
         company_name: form.company_name,
         website: form.website,
@@ -60,9 +61,9 @@ export default function AnalyseAccount() {
         hybrid_fit: scores.hybrid_fit?.value,
         future_enterprise_fit: scores.future_enterprise_fit?.value,
         migration_complexity: scores.migration_complexity?.value,
-        estimated_traditional_cost_low: trad.cost_low,
-        estimated_traditional_cost_expected: trad.cost_expected,
-        estimated_traditional_cost_high: trad.cost_high,
+        estimated_traditional_cost_low: tradCost.low,
+        estimated_traditional_cost_expected: tradCost.expected,
+        estimated_traditional_cost_high: tradCost.high,
         potential_saving: expectedScenario.saving,
         estimated_months_saved: expectedScenario.months_saved,
         priority: derivePriority(scores.transformation_probability?.value, scores.hybrid_fit?.value),

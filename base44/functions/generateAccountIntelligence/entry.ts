@@ -164,19 +164,61 @@ Migration complexity factors: ERP age, customisation, integrations, data volume,
 }
 
 function commercialPrompt(ctx, body) {
-  return `You are HybridIQ's commercial modelling analyst for Hybrid Solutions AI.
-Produce the COMMERCIAL section of an Account Intelligence report as JSON. All figures in GBP. These are illustrative pre-discovery estimates, NOT quotations. Refer to Hybrid's reduction as "up to 70%", never guaranteed.
+  return `You are HybridIQ's ERP Commercial Modelling Engine for Hybrid Solutions AI.
+Produce a structured pre-discovery commercial model as JSON. All figures in GBP. These are ILLUSTRATIVE PRE-DISCOVERY ESTIMATES, NOT quotations.
 
 ${ctx}
+
+## STEP 1 — COMPLEXITY INPUTS
+Capture these 21 complexity inputs (infer reasonable values from context): revenue, employees, erp_users, countries, legal_entities, locations, warehouses, erp_modules, integrations, customisations, erp_age, current_erp, target_erp, migration_type, data_volume, historical_data_requirement, regulatory_requirements, training_population, process_complexity, ma_complexity, data_quality, expected_custom_development.
+
+## MIGRATION TYPES & COMPLEXITY MULTIPLIERS
+Recognise these migration paths and apply the complexity multiplier to base effort:
+- NAV → Business Central: 1.0
+- GP → Business Central: 1.0
+- Sage → Business Central: 0.95
+- SAP Business One → Business Central: 1.1
+- SAP ECC → Business Central: 1.3
+- SAP ECC → SAP S/4HANA: 1.2
+- SAP Business One → SAP S/4HANA: 1.15
+- Oracle EBS → Oracle Fusion: 1.1
+- NetSuite → Oracle Fusion: 1.2
+- Dynamics AX → Dynamics 365 F&O: 1.0
+- Dynamics NAV → Dynamics 365 Business Central: 1.0
+- Other → target ERP: 1.15
+
+## TRADITIONAL IMPLEMENTATION MODEL
+Estimate effort across these 15 workstreams: Discovery, Requirements, Process Design, Architecture, Configuration, Custom Development, Data Migration, Integrations, Testing, Training, Change Management, Programme Management, Governance, Cutover, Hypercare.
+Return Low, Expected AND High estimates for both COST (GBP) and TIME (months) — at the top level AND per workstream. Never produce a single unsupported exact number.
+
+## AI COMPRESSIBILITY (0-100 per workstream)
+Higher (70-90): Requirements, Process Design, Data Migration (mapping/scripts), Testing (test generation/regression), Configuration, Documentation/Reporting.
+Lower (10-30): Change Management, Training, Programme Management, Governance, Cutover, Executive decisions, Stakeholder alignment, Risk management, Complex architecture decisions.
+Human judgement must remain central — never compress governance/change management/cutover below human-led levels.
+
+## HYBRID SCENARIOS — three scenarios
+- CONSERVATIVE: reduction 20-35%
+- EXPECTED: reduction 35-55%
+- MAXIMUM: reduction up to 70%
+Calculate an ACCOUNT-SPECIFIC reduction based on: overall AI compressibility, ERP complexity, integration complexity, customisation, data complexity, governance burden, change-management burden, target ERP, migration type. NEVER exceed 70%. Each scenario needs cost (low/expected/high), duration (low/expected/high), saving, pct_saving, months_saved, pct_faster, timeline_reduction_pct, confidence (LOW/MEDIUM/HIGH), rationale.
+
+## EXPLANATION
+List: primary_cost_drivers (the complexity factors driving cost), ai_saving_opportunities (workstreams most compressible), unlikely_to_compress (workstreams that stay human-led).
+
+## COST OF DELAY
+Estimate: annual_transformation_benefit, annual_operating_cost_saving, expected_revenue_uplift, monthly_manual_process_cost, risk_reduction_value. Then calculate: monthly_value_of_transformation, months_saved (from expected scenario), accelerated_benefit (monthly_value × months_saved), direct_implementation_saving (from expected scenario), combined_economic_impact (accelerated_benefit + direct_implementation_saving).
 
 Return JSON with EXACTLY this top-level key:
 {
   "commercial_model": {
-    "assumptions": { employees(number),erp_users(number),countries(number),entities(number),sites(number),modules(number),integrations(number),customisations(number),erp_age(number),migration_type,target_erp,team_size(number) },
-    "traditional": { cost_low,cost_expected,cost_high,duration_low,duration_expected,duration_high } (GBP cost; months duration for a conventional consultancy implementation),
-    "ai_scenarios": [ {name,reduction_pct,cost,saving,pct_saving,timeline,months_saved,pct_faster,confidence,assumptions(array)} ] (three: Conservative ~30%, Expected ~50%, Maximum up to 70%; adjust reduction by AI-compressibility),
-    "workstreams": [ {name,traditional_cost,traditional_duration,ai_compressibility,ai_cost,ai_duration,saving} ] (14 workstreams: Requirements & Documentation, Process Design, Solution Architecture, Configuration, Custom Development, Data Migration, Integrations, Testing, Training, Change Management, Programme Management, Governance, Cutover, Hypercare; keep change management/governance low compressibility),
-    "cost_of_delay": { value_per_month,months_accelerated,accelerated_business_value,direct_implementation_saving,total_economic_impact }
+    "disclaimer": "Illustrative pre-discovery estimate — validation required.",
+    "complexity_inputs": { revenue, employees, erp_users, countries, legal_entities, locations, warehouses, erp_modules, integrations, customisations, erp_age, current_erp, target_erp, migration_type, data_volume, historical_data_requirement, regulatory_requirements, training_population, process_complexity, ma_complexity, data_quality, expected_custom_development },
+    "migration_assessment": { from, to, migration_type, complexity_multiplier, rationale },
+    "traditional": { "cost": { low, expected, high }, "duration": { low, expected, high }, "workstreams": [ { name, cost_low, cost_expected, cost_high, duration_low, duration_expected, duration_high } ] },
+    "ai_compressibility": { "overall_score": (0-100), "workstreams": [ { name, compressibility, rationale } ] },
+    "hybrid_scenarios": [ { name, reduction_pct, reduction_range, "cost": {low,expected,high}, "duration": {low,expected,high}, saving, pct_saving, months_saved, pct_faster, timeline_reduction_pct, confidence, rationale } ],
+    "explanation": { primary_cost_drivers: [], ai_saving_opportunities: [], unlikely_to_compress: [] },
+    "cost_of_delay": { annual_transformation_benefit, annual_operating_cost_saving, expected_revenue_uplift, monthly_manual_process_cost, risk_reduction_value, monthly_value_of_transformation, months_saved, accelerated_benefit, direct_implementation_saving, combined_economic_impact, "disclaimer": "Scenario estimate — not guaranteed customer ROI." }
   }
 }`;
 }
@@ -213,7 +255,7 @@ function merge(erp, core, commercial, people, body) {
     signals: Array.isArray(core.signals) ? core.signals : [],
     target_erp: erp.target_erp || {},
     attack_plan: core.attack_plan || {},
-    commercial_model: commercial.commercial_model || { assumptions: {}, traditional: {} },
+    commercial_model: commercial.commercial_model || {},
     buying_committee: Array.isArray(people.buying_committee) ? people.buying_committee : [],
     meddpicc: people.meddpicc || {},
     discovery_questions: Array.isArray(people.discovery_questions) ? people.discovery_questions : [],
