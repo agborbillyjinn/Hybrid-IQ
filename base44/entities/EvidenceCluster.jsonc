@@ -44,10 +44,16 @@
       "type": "number"
     },
     "supporting": {
-      "type": "object"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "conflicting": {
-      "type": "object"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "explanation": {
       "type": "string"
