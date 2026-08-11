@@ -173,10 +173,15 @@ async function persistChildren(accountId, companyName, intel) {
     if (intel.evidence?.length) {
       await base44.entities.Evidence.bulkCreate(
         intel.evidence.map((e) => ({
-          account_id: accountId, company: companyName, finding: e.finding, erp: e.erp, date: e.date,
+          account_id: accountId, company: companyName,
+          finding: e.finding, erp: e.erp, erp_vendor: e.erp_vendor, erp_product: e.erp_product, erp_version: e.erp_version,
+          date: e.evidence_date || e.date, evidence_date: e.evidence_date, date_found: e.date_found,
           source_type: e.source_type, source_name: e.source_name, source_url: e.source_url,
-          evidence_extract: e.extract, confidence: e.confidence, status: e.status || e.confidence,
-          last_checked: now, supported_fields: e.supported_fields,
+          evidence_extract: e.evidence_extract || e.extract, evidence_summary: e.evidence_summary,
+          confidence: e.confidence, status: e.status || e.confidence,
+          evidence_strength: e.evidence_strength, confidence_score: e.confidence_score,
+          current_or_historical: e.current_or_historical,
+          last_checked: now, last_verified: e.last_verified, supported_fields: e.supported_fields,
         }))
       );
     }

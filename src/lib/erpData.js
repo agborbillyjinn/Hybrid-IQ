@@ -44,18 +44,88 @@ export const INDUSTRIES = [
 ];
 
 export const SOURCE_TYPES = [
+  "Primary Company Disclosure",
   "Annual Report",
   "Investor Presentation",
-  "Job Advertisement",
+  "Company Technology Page",
   "ERP Vendor Case Study",
   "Implementation Partner Case Study",
-  "Procurement Notice",
-  "News Article",
-  "Company Website",
-  "LinkedIn / Executive Announcement",
+  "Official Procurement Notice",
+  "Current Job Vacancy",
+  "Historic Job Vacancy",
+  "Executive Interview",
+  "Transformation Announcement",
+  "Cloud Migration Announcement",
+  "M&A Information",
+  "Credible Publication",
+  "Third-Party Technology Database",
+  "Unverified Web Mention",
+  "Historic Archived Evidence",
   "Technical Documentation",
   "Other",
 ];
+
+// Evidence Confidence Methodology — source quality weightings (0-100)
+export const SOURCE_WEIGHTS = {
+  "Primary Company Disclosure": 100,
+  "Annual Report": 100,
+  "Investor Presentation": 100,
+  "Company Technology Page": 100,
+  "Transformation Announcement": 100,
+  "Cloud Migration Announcement": 100,
+  "ERP Vendor Case Study": 95,
+  "Implementation Partner Case Study": 90,
+  "Official Procurement Notice": 90,
+  "Current Job Vacancy": 80,
+  "Executive Interview": 80,
+  "M&A Information": 80,
+  "Technical Documentation": 80,
+  "Credible Publication": 70,
+  "Historic Job Vacancy": 60,
+  "Historic Archived Evidence": 60,
+  "Third-Party Technology Database": 55,
+  "Unverified Web Mention": 30,
+  "Other": 50,
+};
+
+export const EVIDENCE_STRENGTHS = ["PRIMARY", "STRONG", "SUPPORTING", "WEAK"];
+
+export function sourceWeight(sourceType) {
+  return SOURCE_WEIGHTS[sourceType] ?? 50;
+}
+
+export function evidenceStrengthStyle(strength) {
+  switch ((strength || "").toUpperCase()) {
+    case "PRIMARY":
+      return { color: "text-emerald-700", bg: "bg-emerald-100 border-emerald-200", dot: "bg-emerald-500", label: "Primary" };
+    case "STRONG":
+      return { color: "text-sky-700", bg: "bg-sky-100 border-sky-200", dot: "bg-sky-500", label: "Strong" };
+    case "SUPPORTING":
+      return { color: "text-amber-700", bg: "bg-amber-100 border-amber-200", dot: "bg-amber-500", label: "Supporting" };
+    case "WEAK":
+      return { color: "text-slate-500", bg: "bg-slate-100 border-slate-200", dot: "bg-slate-400", label: "Weak" };
+    default:
+      return { color: "text-slate-500", bg: "bg-slate-100 border-slate-200", dot: "bg-slate-400", label: "—" };
+  }
+}
+
+export function erpConfidenceLabel(score) {
+  const v = Number(score) || 0;
+  if (v >= 70) return "HIGH";
+  if (v >= 40) return "MEDIUM";
+  return "LOW";
+}
+
+export function erpConfidenceStyle(label) {
+  switch ((label || "").toUpperCase()) {
+    case "HIGH":
+      return { color: "text-emerald-700", bg: "bg-emerald-100 border-emerald-200", bar: "bg-emerald-500" };
+    case "MEDIUM":
+      return { color: "text-amber-700", bg: "bg-amber-100 border-amber-200", bar: "bg-amber-500" };
+    default:
+      return { color: "text-rose-700", bg: "bg-rose-100 border-rose-200", bar: "bg-rose-500" };
+  }
+}
 
 export const SIGNAL_CATEGORIES = [
   "Executive Changes",

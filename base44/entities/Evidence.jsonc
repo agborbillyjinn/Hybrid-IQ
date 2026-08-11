@@ -14,8 +14,26 @@
     "erp": {
       "type": "string"
     },
-    "date": {
+    "erp_vendor": {
       "type": "string"
+    },
+    "erp_product": {
+      "type": "string"
+    },
+    "erp_version": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "evidence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "date_found": {
+      "type": "string",
+      "format": "date-time"
     },
     "source_type": {
       "type": "string"
@@ -27,6 +45,9 @@
       "type": "string"
     },
     "evidence_extract": {
+      "type": "string"
+    },
+    "evidence_summary": {
       "type": "string"
     },
     "confidence": {
@@ -49,7 +70,32 @@
       ],
       "default": "INFERRED"
     },
+    "evidence_strength": {
+      "type": "string",
+      "enum": [
+        "PRIMARY",
+        "STRONG",
+        "SUPPORTING",
+        "WEAK"
+      ],
+      "default": "SUPPORTING"
+    },
+    "confidence_score": {
+      "type": "number"
+    },
+    "current_or_historical": {
+      "type": "string",
+      "enum": [
+        "CURRENT",
+        "HISTORICAL"
+      ],
+      "default": "CURRENT"
+    },
     "last_checked": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_verified": {
       "type": "string",
       "format": "date-time"
     },

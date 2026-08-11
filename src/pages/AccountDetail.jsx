@@ -6,7 +6,7 @@ import { TierBadge, PriorityBadge } from "@/components/intelligence/Badges";
 import { formatDate, formatCurrency, formatNumber } from "@/lib/format";
 import OverviewTab from "@/components/account-tabs/OverviewTab";
 import ERPEstateTab from "@/components/account-tabs/ERPEstateTab";
-import ERPHistoryTab from "@/components/account-tabs/ERPHistoryTab";
+import ERPIntelligenceTab from "@/components/account-tabs/ERPIntelligenceTab";
 import SignalsTab from "@/components/account-tabs/SignalsTab";
 import ComplexityTab from "@/components/account-tabs/ComplexityTab";
 import CommercialTab from "@/components/account-tabs/CommercialTab";
@@ -15,7 +15,7 @@ import MeddpiccTab from "@/components/account-tabs/MeddpiccTab";
 import OutreachTab from "@/components/account-tabs/OutreachTab";
 import EvidenceTab from "@/components/account-tabs/EvidenceTab";
 
-const TABS = ["Overview", "ERP Estate", "ERP History", "Transformation Signals", "Migration Complexity", "Commercial Model", "Buying Committee", "MEDDPICC", "Outreach", "Evidence"];
+const TABS = ["Overview", "ERP Estate", "ERP Intelligence", "Transformation Signals", "Migration Complexity", "Commercial Model", "Buying Committee", "MEDDPICC", "Outreach", "Evidence"];
 
 export default function AccountDetail() {
   const { id } = useParams();
@@ -134,7 +134,7 @@ export default function AccountDetail() {
       <div className="p-8 bg-slate-50 min-h-[60vh]">
         {tab === "Overview" && <OverviewTab account={account} intel={intel} />}
         {tab === "ERP Estate" && <ERPEstateTab intel={intel} />}
-        {tab === "ERP History" && <ERPHistoryTab intel={intel} accountId={account.id} />}
+        {tab === "ERP Intelligence" && <ERPIntelligenceTab account={account} intel={intel} />}
         {tab === "Transformation Signals" && <SignalsTab intel={intel} accountId={account.id} />}
         {tab === "Migration Complexity" && <ComplexityTab intel={intel} />}
         {tab === "Commercial Model" && <CommercialTab intel={intel} />}
