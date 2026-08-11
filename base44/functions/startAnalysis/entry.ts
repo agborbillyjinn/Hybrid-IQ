@@ -26,11 +26,11 @@ export default async function(req: Request): Promise<Response> {
     const company = (body.company_name || "").trim();
     if (!company) return Response.json({ error: "company_name is required" }, { status: 400 });
 
-    // Determine research mode: explicit body param > jobs_research config notes > mock toggle > LIVE
+    // Determine research mode: explicit body param > jobs_research config notes > LIVE default
+    // Mock is opt-in ONLY — never silently applied to real companies. Select it via the Research Mode dropdown.
     const jobsConfig = await getIntegrationConfig(base44, "jobs_research");
-    const mockConfig = await getIntegrationConfig(base44, "mock");
     let mode = (body.research_mode || jobsConfig?.notes || "").toUpperCase();
-    if (!["MOCK", "LIVE", "HYBRID"].includes(mode)) mode = mockConfig?.enabled ? "MOCK" : "LIVE";
+    if (!["MOCK", "LIVE", "HYBRID"].includes(mode)) mode = "LIVE";
 
     const analysisId = "job_" + crypto.randomUUID();
     const now = new Date().toISOString();

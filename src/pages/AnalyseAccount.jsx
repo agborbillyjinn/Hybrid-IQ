@@ -128,7 +128,7 @@ export default function AnalyseAccount() {
           <div>
             <Label className="text-xs font-medium text-slate-600">Research Mode</Label>
             <Select value={form.research_mode || ""} onValueChange={(v) => set("research_mode", v)}>
-              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Use default (from settings)" /></SelectTrigger>
+            <SelectTrigger className="mt-1.5"><SelectValue placeholder="LIVE (default)" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="MOCK">MOCK — test data</SelectItem>
                 <SelectItem value="LIVE">LIVE — external job sources</SelectItem>

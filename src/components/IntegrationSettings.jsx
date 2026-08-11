@@ -70,7 +70,7 @@ export default function IntegrationSettings() {
             <FlaskConical className="w-4 h-4 text-violet-600" />
             <div>
               <div className="text-sm font-semibold text-slate-900">Mock Analysis Mode</div>
-              <div className="text-xs text-slate-500">Run the full orchestration with realistic test data — no external API or n8n required</div>
+              <div className="text-xs text-slate-500">Mock is now opt-in per analysis via the Research Mode dropdown on the Analyse page — real companies always run live research by default.</div>
             </div>
           </div>
           <Switch checked={!!(configs["mock"] || {}).enabled} onCheckedChange={(v) => update("mock", "enabled", v)} />
