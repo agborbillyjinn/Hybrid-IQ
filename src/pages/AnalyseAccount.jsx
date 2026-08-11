@@ -1,0 +1,204 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Crosshair, Loader2, Sparkles } from "lucide-react";
+import { ERP_SYSTEMS, INDUSTRIES } from "@/lib/erpData";
+
+const FIELDS = [
+  { name: "company_name", label: "Company Name", required: true, placeholder: "e.g. Contoso Manufacturing Ltd" },
+  { name: "website", label: "Company Website", placeholder: "https://…" },
+  { name: "country", label: "Country", placeholder: "United Kingdom" },
+  { name: "estimated_erp_users", label: "Estimated ERP Users", type: "number" },
+  { name: "employees", label: "Employees", type: "number" },
+  { name: "revenue", label: "Revenue (GBP)", type: "number" },
+];
+
+export default function AnalyseAccount() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const runAnalysis = async () => {
+    if (!form.company_name?.trim()) {
+      setError("Company name is required.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await base44.functions.invoke("generateAccountIntelligence", form);
+      const intel = res.data.intelligence;
+      const scores = intel.scores || {};
+      const cm = intel.commercial_model || {};
+      const trad = cm.traditional || {};
+      const expectedScenario = (cm.ai_scenarios || []).find((s) => s.name?.toLowerCase().includes("expected")) || {};
+      const account = await base44.entities.Account.create({
+        company_name: form.company_name,
+        website: form.website,
+        country: form.country,
+        industry: form.industry || intel.company_overview?.industry,
+        known_erp: form.known_erp,
+        estimated_erp_users: num(form.estimated_erp_users),
+        employees: num(form.employees) || intel.company_overview?.employees,
+        revenue: num(form.revenue) || intel.company_overview?.revenue,
+        notes: form.notes,
+        logo_url: intel.company_overview?.logo_url || "",
+        headquarters: intel.company_overview?.headquarters,
+        locations: intel.company_overview?.locations,
+        ownership: intel.company_overview?.ownership,
+        last_analysed: new Date().toISOString(),
+        transformation_probability: scores.transformation_probability?.value,
+        hybrid_fit: scores.hybrid_fit?.value,
+        future_enterprise_fit: scores.future_enterprise_fit?.value,
+        migration_complexity: scores.migration_complexity?.value,
+        estimated_traditional_cost_low: trad.cost_low,
+        estimated_traditional_cost_expected: trad.cost_expected,
+        estimated_traditional_cost_high: trad.cost_high,
+        potential_saving: expectedScenario.saving,
+        estimated_months_saved: expectedScenario.months_saved,
+        priority: derivePriority(scores.transformation_probability?.value, scores.hybrid_fit?.value),
+        primary_trigger: (intel.signals || [])[0]?.signal,
+        current_erp: intel.erp_estate?.current_erp_product?.value || form.known_erp,
+        target_erp: intel.target_erp?.next_erp,
+        saved: false,
+        intelligence: intel,
+      });
+      await persistChildren(account.id, form.company_name, intel);
+      navigate(`/accounts/${account.id}`);
+    } catch (e) {
+      setError(e.message || "Analysis failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      <div className="flex items-center gap-3 mb-1">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+          <Crosshair className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Analyse Account</h1>
+          <p className="text-sm text-slate-500">Run AI account intelligence on any company across 20+ ERP systems.</p>
+        </div>
+      </div>
+
+      <Card className="mt-6 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {FIELDS.map((f) => (
+            <div key={f.name} className={f.name === "company_name" ? "md:col-span-2" : ""}>
+              <Label className="text-xs font-medium text-slate-600">
+                {f.label}{f.required && <span className="text-rose-500 ml-0.5">*</span>}
+              </Label>
+              <Input
+                type={f.type || "text"}
+                value={form[f.name] || ""}
+                onChange={(e) => set(f.name, e.target.value)}
+                placeholder={f.placeholder}
+                className="mt-1.5"
+              />
+            </div>
+          ))}
+          <div>
+            <Label className="text-xs font-medium text-slate-600">Industry</Label>
+            <Select value={form.industry || ""} onValueChange={(v) => set("industry", v)}>
+              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select industry" /></SelectTrigger>
+              <SelectContent>{INDUSTRIES.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-medium text-slate-600">Known ERP</Label>
+            <Select value={form.known_erp || ""} onValueChange={(v) => set("known_erp", v)}>
+              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Optional — AI will infer" /></SelectTrigger>
+              <SelectContent>{ERP_SYSTEMS.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="md:col-span-2">
+            <Label className="text-xs font-medium text-slate-600">Notes</Label>
+            <Textarea
+              value={form.notes || ""}
+              onChange={(e) => set("notes", e.target.value)}
+              placeholder="Anything the AI should know — context, rumours, prior conversations…"
+              className="mt-1.5"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        {error && <p className="text-sm text-rose-600 mt-4">{error}</p>}
+
+        <Button
+          onClick={runAnalysis}
+          disabled={loading}
+          size="lg"
+          className="mt-6 w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700"
+        >
+          {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+          {loading ? "Running account intelligence…" : "Run Account Intelligence"}
+        </Button>
+        <p className="text-[11px] text-slate-400 text-center mt-3">
+          AI-generated intelligence distinguishes fact, inference, estimate and hypothesis. Commercial figures are illustrative pre-discovery estimates.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+function num(v) {
+  const n = Number(v);
+  return isNaN(n) ? undefined : n;
+}
+
+function derivePriority(prob, fit) {
+  const p = Number(prob) || 0;
+  const f = Number(fit) || 0;
+  if (p >= 70 && f >= 60) return "High";
+  if (p >= 45 || f >= 45) return "Medium";
+  return "Low";
+}
+
+async function persistChildren(accountId, companyName, intel) {
+  try {
+    const now = new Date().toISOString();
+    if (intel.evidence?.length) {
+      await base44.entities.Evidence.bulkCreate(
+        intel.evidence.map((e) => ({
+          account_id: accountId, company: companyName, finding: e.finding, erp: e.erp, date: e.date,
+          source_type: e.source_type, source_name: e.source_name, source_url: e.source_url,
+          evidence_extract: e.extract, confidence: e.confidence, status: e.status || e.confidence,
+          last_checked: now, supported_fields: e.supported_fields,
+        }))
+      );
+    }
+    if (intel.signals?.length) {
+      await base44.entities.Signal.bulkCreate(
+        intel.signals.map((s) => ({
+          account_id: accountId, company: companyName, signal: s.signal, category: s.category, date: s.date,
+          strength: s.strength, source: s.source, confidence: s.confidence,
+          why_it_matters: s.why_it_matters, impact_on_probability: s.impact_on_probability,
+        }))
+      );
+    }
+    if (intel.erp_history?.length) {
+      await base44.entities.ERPEvent.bulkCreate(
+        intel.erp_history.map((h) => ({
+          account_id: accountId, company: companyName, date: h.date, erp: h.erp, event_type: h.event_type,
+          description: h.description, confidence: h.confidence, evidence: h.evidence,
+          source_url: h.source_url, source_type: h.source_type,
+        }))
+      );
+    }
+  } catch (e) {
+    // non-critical
+  }
+}

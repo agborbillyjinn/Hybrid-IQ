@@ -1,0 +1,53 @@
+{
+  "name": "Signal",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "signal": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "strength": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "default": "Medium"
+    },
+    "source": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "CONFIRMED",
+        "HIGHLY LIKELY",
+        "INFERRED",
+        "UNKNOWN"
+      ],
+      "default": "INFERRED"
+    },
+    "why_it_matters": {
+      "type": "string"
+    },
+    "impact_on_probability": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "account_id",
+    "signal"
+  ]
+}

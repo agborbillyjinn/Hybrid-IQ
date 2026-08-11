@@ -1,0 +1,67 @@
+{
+  "name": "Pipeline",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "current_erp": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "Research",
+        "Target",
+        "Contacted",
+        "Discovery",
+        "Qualified",
+        "Technical Validation",
+        "Commercial",
+        "Proposal",
+        "Negotiation",
+        "Closed Won",
+        "Closed Lost"
+      ],
+      "default": "Research"
+    },
+    "potential_value": {
+      "type": "number"
+    },
+    "traditional_value": {
+      "type": "number"
+    },
+    "hybrid_value": {
+      "type": "number"
+    },
+    "client_saving": {
+      "type": "number"
+    },
+    "transformation_probability": {
+      "type": "number"
+    },
+    "hybrid_fit": {
+      "type": "number"
+    },
+    "meddpicc_completeness": {
+      "type": "number"
+    },
+    "next_action": {
+      "type": "string"
+    },
+    "next_action_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "account_id",
+    "company"
+  ]
+}

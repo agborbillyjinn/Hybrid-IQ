@@ -1,0 +1,114 @@
+{
+  "name": "Account",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "known_erp": {
+      "type": "string"
+    },
+    "estimated_erp_users": {
+      "type": "number"
+    },
+    "employees": {
+      "type": "number"
+    },
+    "revenue": {
+      "type": "number"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "headquarters": {
+      "type": "string"
+    },
+    "locations": {
+      "type": "string"
+    },
+    "ownership": {
+      "type": "string"
+    },
+    "account_priority": {
+      "type": "string",
+      "enum": [
+        "Tier 1",
+        "Tier 2",
+        "Tier 3",
+        "Watch"
+      ],
+      "default": "Tier 2"
+    },
+    "last_analysed": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "transformation_probability": {
+      "type": "number"
+    },
+    "hybrid_fit": {
+      "type": "number"
+    },
+    "future_enterprise_fit": {
+      "type": "number"
+    },
+    "migration_complexity": {
+      "type": "number"
+    },
+    "estimated_traditional_cost_low": {
+      "type": "number"
+    },
+    "estimated_traditional_cost_expected": {
+      "type": "number"
+    },
+    "estimated_traditional_cost_high": {
+      "type": "number"
+    },
+    "potential_saving": {
+      "type": "number"
+    },
+    "estimated_months_saved": {
+      "type": "number"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "default": "Medium"
+    },
+    "primary_trigger": {
+      "type": "string"
+    },
+    "current_erp": {
+      "type": "string"
+    },
+    "target_erp": {
+      "type": "string"
+    },
+    "saved": {
+      "type": "boolean",
+      "default": false
+    },
+    "intelligence": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "company_name"
+  ]
+}

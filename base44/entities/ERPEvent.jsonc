@@ -1,0 +1,48 @@
+{
+  "name": "ERPEvent",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "erp": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "CONFIRMED",
+        "HIGHLY LIKELY",
+        "INFERRED",
+        "UNKNOWN"
+      ],
+      "default": "INFERRED"
+    },
+    "evidence": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "source_type": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_id",
+    "date",
+    "description"
+  ]
+}

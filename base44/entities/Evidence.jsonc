@@ -1,0 +1,64 @@
+{
+  "name": "Evidence",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "finding": {
+      "type": "string"
+    },
+    "erp": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "source_type": {
+      "type": "string"
+    },
+    "source_name": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "evidence_extract": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "CONFIRMED",
+        "HIGHLY LIKELY",
+        "INFERRED",
+        "UNKNOWN"
+      ],
+      "default": "INFERRED"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CONFIRMED",
+        "HIGHLY LIKELY",
+        "INFERRED",
+        "UNKNOWN"
+      ],
+      "default": "INFERRED"
+    },
+    "last_checked": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "supported_fields": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_id",
+    "finding"
+  ]
+}
