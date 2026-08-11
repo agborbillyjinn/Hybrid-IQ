@@ -15,8 +15,9 @@ import MeddpiccTab from "@/components/account-tabs/MeddpiccTab";
 import OutreachTab from "@/components/account-tabs/OutreachTab";
 import EvidenceTab from "@/components/account-tabs/EvidenceTab";
 import DebugTab from "@/components/account-tabs/DebugTab";
+import HiringIntelligenceTab from "@/components/account-tabs/HiringIntelligenceTab";
 
-const TABS = ["Overview", "ERP Estate", "ERP Intelligence", "Transformation Signals", "Migration Complexity", "Commercial Model", "Buying Committee", "MEDDPICC", "Outreach", "Evidence", "Debug"];
+const TABS = ["Overview", "ERP Estate", "ERP Intelligence", "Transformation Signals", "Migration Complexity", "Commercial Model", "Buying Committee", "MEDDPICC", "Outreach", "Evidence", "Hiring Intelligence", "Debug"];
 
 export default function AccountDetail() {
   const { id } = useParams();
@@ -146,6 +147,7 @@ export default function AccountDetail() {
         {tab === "MEDDPICC" && <MeddpiccTab account={account} onUpdate={updateAccount} />}
         {tab === "Outreach" && <OutreachTab account={account} intel={intel} />}
         {tab === "Evidence" && <EvidenceTab account={account} intel={intel} />}
+        {tab === "Hiring Intelligence" && <HiringIntelligenceTab account={account} intel={intel} />}
         {tab === "Debug" && <DebugTab account={account} />}
       </div>
     </div>

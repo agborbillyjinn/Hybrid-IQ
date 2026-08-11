@@ -1,0 +1,168 @@
+{
+  "name": "JobVacancy",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "job_title": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "date_posted": {
+      "type": "string",
+      "format": "date"
+    },
+    "date_first_detected": {
+      "type": "string",
+      "format": "date"
+    },
+    "date_last_detected": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "HISTORICAL"
+      ],
+      "default": "ACTIVE"
+    },
+    "employment_type": {
+      "type": "string",
+      "enum": [
+        "Permanent",
+        "Contract",
+        "Consultant",
+        "Unknown"
+      ],
+      "default": "Unknown"
+    },
+    "salary_low": {
+      "type": "number"
+    },
+    "salary_high": {
+      "type": "number"
+    },
+    "contract_rate_low": {
+      "type": "number"
+    },
+    "contract_rate_high": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "default": "GBP"
+    },
+    "advertised_compensation": {
+      "type": "string"
+    },
+    "erp_vendor": {
+      "type": "string"
+    },
+    "erp_product": {
+      "type": "string"
+    },
+    "erp_version": {
+      "type": "string"
+    },
+    "erp_modules": {
+      "type": "string"
+    },
+    "technical_skills": {
+      "type": "string"
+    },
+    "integration_technologies": {
+      "type": "string"
+    },
+    "cloud_technologies": {
+      "type": "string"
+    },
+    "responsibilities": {
+      "type": "string"
+    },
+    "programme_language": {
+      "type": "string"
+    },
+    "migration_language": {
+      "type": "string"
+    },
+    "transformation_language": {
+      "type": "string"
+    },
+    "implementation_language": {
+      "type": "string"
+    },
+    "support_language": {
+      "type": "string"
+    },
+    "greenfield_brownfield": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "evidence_confidence": {
+      "type": "number"
+    },
+    "classification": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_id",
+    "job_title"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

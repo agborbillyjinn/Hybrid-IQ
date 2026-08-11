@@ -6,6 +6,7 @@ import TransformationEconomics from "@/components/account-tabs/overview/Transfor
 import CriticalResearchGap from "@/components/account-tabs/overview/CriticalResearchGap";
 import ScoreRelationship from "@/components/account-tabs/overview/ScoreRelationship";
 import EvidenceHealth from "@/components/account-tabs/overview/EvidenceHealth";
+import HiringIntelligenceCard from "@/components/account-tabs/overview/HiringIntelligenceCard";
 import { Target, TrendingUp, Zap, Layers, AlertCircle, Lightbulb, Compass } from "lucide-react";
 
 export default function OverviewTab({ account, intel, onNavigateTab }) {
@@ -25,6 +26,9 @@ export default function OverviewTab({ account, intel, onNavigateTab }) {
         <CriticalResearchGap intel={intel} account={account} />
         <ERPEvidenceSummary intel={intel} account={account} onViewEvidence={() => onNavigateTab?.("Evidence")} />
       </div>
+
+      {/* ERP Hiring Intelligence (compact) */}
+      <HiringIntelligenceCard intel={intel} onView={() => onNavigateTab?.("Hiring Intelligence")} />
 
       {/* Transformation Economics */}
       <TransformationEconomics intel={intel} onViewCommercial={() => onNavigateTab?.("Commercial Model")} />

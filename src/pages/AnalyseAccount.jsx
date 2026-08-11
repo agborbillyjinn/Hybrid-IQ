@@ -272,6 +272,30 @@ async function persistChildren(accountId, companyName, intel) {
         }))
       );
     }
+    if (intel.job_vacancies?.length) {
+      await base44.entities.JobVacancy.bulkCreate(
+        intel.job_vacancies.map((v) => ({
+          account_id: accountId, company: companyName,
+          job_title: v.job_title, location: v.location,
+          date_posted: v.date_posted, date_first_detected: v.date_first_detected, date_last_detected: v.date_last_detected,
+          status: v.status, employment_type: v.employment_type,
+          salary_low: v.salary_low, salary_high: v.salary_high,
+          contract_rate_low: v.contract_rate_low, contract_rate_high: v.contract_rate_high,
+          currency: v.currency, advertised_compensation: v.advertised_compensation,
+          erp_vendor: v.erp_vendor, erp_product: v.erp_product, erp_version: v.erp_version,
+          erp_modules: (v.erp_modules || []).join(", "),
+          technical_skills: (v.technical_skills || []).join(", "),
+          integration_technologies: (v.integration_technologies || []).join(", "),
+          cloud_technologies: (v.cloud_technologies || []).join(", "),
+          responsibilities: v.responsibilities,
+          programme_language: v.programme_language, migration_language: v.migration_language,
+          transformation_language: v.transformation_language, implementation_language: v.implementation_language,
+          support_language: v.support_language, greenfield_brownfield: v.greenfield_brownfield,
+          source: v.source, source_url: v.source_url, evidence_confidence: v.evidence_confidence,
+          classification: v.classification,
+        }))
+      );
+    }
   } catch (e) {
     // non-critical
   }

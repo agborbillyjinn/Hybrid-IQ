@@ -1,6 +1,7 @@
 // Canonical normalizer shared by receiveAnalysisResults (external webhook) and mock analysis.
 // Any source — n8n, external API, mock, future agent — flows through this to produce the
 // same intelligence structure the UI renders.
+import { analyzeHiringIntelligence } from "./hiringIntelligence.ts";
 
 export function normalizeIntelligence(body) {
   const signals = [
@@ -17,6 +18,18 @@ export function normalizeIntelligence(body) {
     future_enterprise_fit: wrapScore(body.future_enterprise_fit),
     migration_complexity: wrapScore(body.migration_complexity),
   };
+  const commercial_model = body.commercial_assumptions || body.commercial_model || {};
+  const hiring = (body.job_vacancies && body.job_vacancies.length)
+    ? analyzeHiringIntelligence(body.job_vacancies, {
+        commercial_model,
+        employees: body.company_profile?.employees,
+        estimated_users: body.erp_estate?.estimated_users?.value,
+        countries: body.erp_estate?.countries?.value,
+        legal_entities: body.erp_estate?.legal_entities?.value,
+        migration_complexity: typeof body.migration_complexity === "object" ? body.migration_complexity?.value : body.migration_complexity,
+      })
+    : null;
+
   return {
     company_overview: body.company_profile || body.company_overview || { name: body.company_name },
     financial_profile: body.financial_profile,
@@ -37,6 +50,8 @@ export function normalizeIntelligence(body) {
     outreach: body.outreach,
     attack_plan: body.attack_plan || {},
     scores: { ...(body.scores || {}), ...scores },
+    job_vacancies: body.job_vacancies || [],
+    hiring_intelligence: hiring,
     source_provider: body.source_provider,
   };
 }
