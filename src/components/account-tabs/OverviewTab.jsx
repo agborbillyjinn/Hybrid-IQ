@@ -7,6 +7,7 @@ import CriticalResearchGap from "@/components/account-tabs/overview/CriticalRese
 import ScoreRelationship from "@/components/account-tabs/overview/ScoreRelationship";
 import EvidenceHealth from "@/components/account-tabs/overview/EvidenceHealth";
 import HiringIntelligenceCard from "@/components/account-tabs/overview/HiringIntelligenceCard";
+import ReconciliationSummaryCard from "@/components/account-tabs/overview/ReconciliationSummaryCard";
 import { Target, TrendingUp, Zap, Layers, AlertCircle, Lightbulb, Compass } from "lucide-react";
 
 export default function OverviewTab({ account, intel, onNavigateTab }) {
@@ -20,6 +21,9 @@ export default function OverviewTab({ account, intel, onNavigateTab }) {
         <p className="text-xs text-slate-400 mb-5">Four independent models. All scores are AI estimates with evidence-backed confidence.</p>
         <ScoreExplanations scores={intel.scores || {}} />
       </div>
+
+      {/* Cross-Source Evidence Reconciliation (compact) */}
+      <ReconciliationSummaryCard intel={intel} onViewEvidence={() => onNavigateTab?.("Evidence")} />
 
       {/* Critical Research Gap | ERP Evidence */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

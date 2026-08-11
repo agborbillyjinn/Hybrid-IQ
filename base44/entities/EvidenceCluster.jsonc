@@ -1,0 +1,116 @@
+{
+  "name": "EvidenceCluster",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "analysis_id": {
+      "type": "string"
+    },
+    "conclusion_tag": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "value": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "CONFIRMED",
+        "HIGHLY LIKELY",
+        "INFERRED",
+        "MIXED",
+        "UNKNOWN"
+      ],
+      "default": "UNKNOWN"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "independent_sources": {
+      "type": "number"
+    },
+    "supporting_count": {
+      "type": "number"
+    },
+    "conflicting_count": {
+      "type": "number"
+    },
+    "supporting": {
+      "type": "object"
+    },
+    "conflicting": {
+      "type": "object"
+    },
+    "explanation": {
+      "type": "string"
+    },
+    "interpretation": {
+      "type": "string"
+    },
+    "latest_evidence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "erp_vendor": {
+      "type": "string"
+    },
+    "erp_product": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_id",
+    "label"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

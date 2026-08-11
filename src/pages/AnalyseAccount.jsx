@@ -63,6 +63,13 @@ export default function AnalyseAccount() {
 
       const account = await createAccountFromIntelligence(form, intelligence, data.analysis_id);
       await persistChildren(account.id, form.company_name, intelligence);
+      // Persist evidence clusters + initial version snapshot
+      try {
+        await base44.functions.invoke("reconcileEvidence", {
+          account_id: account.id, company_name: form.company_name,
+          intelligence, analysis_id: data.analysis_id, trigger_reason: "initial_analysis",
+        });
+      } catch (e) {}
       navigate(`/accounts/${account.id}`);
     } catch (e) {
       clearInterval(timerRef.current);

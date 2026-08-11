@@ -44,6 +44,36 @@
     "source_url": {
       "type": "string"
     },
+    "source_origin": {
+      "type": "string"
+    },
+    "canonical_source": {
+      "type": "string"
+    },
+    "duplicate_group_id": {
+      "type": "string"
+    },
+    "source_strength": {
+      "type": "number"
+    },
+    "source_category": {
+      "type": "string"
+    },
+    "conclusion_tag": {
+      "type": "string"
+    },
+    "cluster_id": {
+      "type": "string"
+    },
+    "stance": {
+      "type": "string",
+      "enum": [
+        "supporting",
+        "conflicting",
+        "neutral"
+      ],
+      "default": "supporting"
+    },
     "evidence_extract": {
       "type": "string"
     },
@@ -106,5 +136,48 @@
   "required": [
     "account_id",
     "finding"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

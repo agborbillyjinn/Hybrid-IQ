@@ -2,6 +2,7 @@
 // Any source — n8n, external API, mock, future agent — flows through this to produce the
 // same intelligence structure the UI renders.
 import { analyzeHiringIntelligence } from "./hiringIntelligence.ts";
+import { reconcileEvidence } from "./evidenceReconciliation.ts";
 
 export function normalizeIntelligence(body) {
   const signals = [
@@ -54,7 +55,15 @@ export function normalizeIntelligence(body) {
     hiring_intelligence: hiring,
     research_metadata: body.research_metadata || null,
     source_provider: body.source_provider,
+    reconciliation: body.reconciliation || null,
   };
+}
+
+export function attachReconciliation(intelligence: any) {
+  if (!intelligence) return intelligence;
+  if (intelligence.reconciliation) return intelligence;
+  intelligence.reconciliation = reconcileEvidence(intelligence, intelligence.evidence || []);
+  return intelligence;
 }
 
 export function wrapScore(v) {

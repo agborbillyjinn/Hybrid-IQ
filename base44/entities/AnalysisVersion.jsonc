@@ -1,0 +1,96 @@
+{
+  "name": "AnalysisVersion",
+  "type": "object",
+  "properties": {
+    "account_id": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "analysis_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "number"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_count": {
+      "type": "number"
+    },
+    "independent_source_count": {
+      "type": "number"
+    },
+    "evidence_health": {
+      "type": "number"
+    },
+    "major_conclusions": {
+      "type": "object"
+    },
+    "scores": {
+      "type": "object"
+    },
+    "commercial_assumptions": {
+      "type": "object"
+    },
+    "erp_estate": {
+      "type": "object"
+    },
+    "research_gaps_count": {
+      "type": "number"
+    },
+    "trigger_reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_id",
+    "version"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

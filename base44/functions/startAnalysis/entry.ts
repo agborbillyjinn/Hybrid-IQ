@@ -5,6 +5,7 @@ import { buildMockPayload } from "../../shared/mockResearchData.ts";
 import { analyzeHiringIntelligence } from "../../shared/hiringIntelligence.ts";
 import { buildSearchQueries } from "../../shared/vacancyResearch.ts";
 import { getIntegrationConfig } from "../../shared/integrationConfig.ts";
+import { reconcileEvidence } from "../../shared/evidenceReconciliation.ts";
 
 const ANALYSIS_VERSION = "1.1";
 const MOCK_STAGES = [
@@ -116,6 +117,9 @@ async function runBuiltInAnalysis(base44: any, job: any, body: any, company: str
       intelligence.hiring_intelligence = null;
     }
 
+    // Cross-source evidence reconciliation
+    intelligence.reconciliation = reconcileEvidence(intelligence, intelligence.evidence || []);
+
     await base44.entities.AnalysisJob.update(job.id, {
       status: "complete",
       completed_at: new Date().toISOString(),
@@ -145,6 +149,7 @@ async function simulateMockAnalysis(base44: any, jobId: string, analysisId: stri
   }
   const mockPayload = buildMockPayload(company, analysisId);
   const intelligence = normalizeIntelligence(mockPayload);
+  intelligence.reconciliation = reconcileEvidence(intelligence, intelligence.evidence || []);
   try {
     await base44.asServiceRole.entities.AnalysisJob.update(jobId, {
       status: "complete",
