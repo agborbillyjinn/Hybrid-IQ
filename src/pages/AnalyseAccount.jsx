@@ -70,6 +70,10 @@ export default function AnalyseAccount() {
           intelligence, analysis_id: data.analysis_id, trigger_reason: "initial_analysis",
         });
       } catch (e) {}
+      // Run quality validation (VALIDATING ANALYSIS stage)
+      try {
+        await base44.functions.invoke("validateAnalysisQuality", { account_id: account.id, intelligence });
+      } catch (e) {}
       navigate(`/accounts/${account.id}`);
     } catch (e) {
       clearInterval(timerRef.current);

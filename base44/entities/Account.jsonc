@@ -112,6 +112,41 @@
     },
     "source_provider": {
       "type": "string"
+    },
+    "is_demo_account": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_locked": {
+      "type": "boolean",
+      "default": false
+    },
+    "locked_snapshot_id": {
+      "type": "string"
+    },
+    "demo_narrative": {
+      "type": "string"
+    },
+    "quality_score": {
+      "type": "number"
+    },
+    "quality_status": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "REVIEW",
+        "FAIL"
+      ],
+      "default": "REVIEW"
+    },
+    "quality_breakdown": {
+      "type": "object"
+    },
+    "red_flags": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     }
   },
   "required": [

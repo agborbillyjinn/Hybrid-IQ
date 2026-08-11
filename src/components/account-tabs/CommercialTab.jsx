@@ -5,6 +5,9 @@ import TraditionalEstimate from "./commercial/TraditionalEstimate";
 import HybridScenarios from "./commercial/HybridScenarios";
 import Explanation from "./commercial/Explanation";
 import CostOfDelay from "./commercial/CostOfDelay";
+import CommercialExplainability from "./commercial/CommercialExplainability";
+import ConsultantDayModel from "./commercial/ConsultantDayModel";
+import CommercialSensitivity from "./commercial/CommercialSensitivity";
 
 export default function CommercialTab({ intel }) {
   const cm = intel.commercial_model || {};
@@ -21,6 +24,9 @@ export default function CommercialTab({ intel }) {
       <HybridScenarios scenarios={cm.hybrid_scenarios} />
       <Explanation explanation={cm.explanation} />
       <CostOfDelay cod={cm.cost_of_delay} />
+      <CommercialExplainability intel={intel} />
+      <ConsultantDayModel intel={intel} />
+      <CommercialSensitivity intel={intel} />
     </div>
   );
 }

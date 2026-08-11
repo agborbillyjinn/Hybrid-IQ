@@ -14,6 +14,7 @@ export const STAGES = [
   { key: "analysing_hiring_signals", label: "Analysing Hiring Signals" },
   { key: "inferring_programme_stage", label: "Inferring Programme Stage" },
   { key: "estimating_consulting_demand", label: "Estimating Consulting Demand" },
+  { key: "validating_analysis", label: "Validating Analysis" },
   { key: "complete", label: "Analysis Complete" },
 ];
 

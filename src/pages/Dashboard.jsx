@@ -5,6 +5,7 @@ import { ConfidenceBadge, PriorityBadge } from "@/components/intelligence/Badges
 import { formatCurrency, formatDate, timeAgo } from "@/lib/format";
 import { Link } from "react-router-dom";
 import { Building2, Target, Crosshair, Gauge, TrendingUp, AlertTriangle, Clock, ArrowRight, Radar } from "lucide-react";
+import DemoAccountsSection from "@/components/dashboard/DemoAccountsSection";
 
 export default function Dashboard() {
   const [accounts, setAccounts] = useState([]);
@@ -29,6 +30,16 @@ export default function Dashboard() {
   const recent = accounts.slice(0, 8);
   const priority = [...accounts].sort((a, b) => (b.transformation_probability || 0) - (a.transformation_probability || 0)).slice(0, 5);
 
+  const togglePin = async (account) => {
+    const demoCount = accounts.filter((a) => a.is_demo_account).length;
+    if (!account.is_demo_account && demoCount >= 5) return; // max 5
+    try {
+      const next = !account.is_demo_account;
+      await base44.entities.Account.update(account.id, { is_demo_account: next });
+      setAccounts((accs) => accs.map((a) => (a.id === account.id ? { ...a, is_demo_account: next } : a)));
+    } catch (e) {}
+  };
+
   if (loading) return <div className="p-8 text-slate-400">Loading dashboard…</div>;
 
   return (
@@ -48,6 +59,8 @@ export default function Dashboard() {
         <StatCard label="High-Urgency Accounts" value={kpis.urgent} icon={AlertTriangle} accent="rose" />
         <StatCard label="Recent Changes" value={signals.length} icon={Clock} accent="slate" />
       </div>
+
+      <DemoAccountsSection accounts={accounts} onTogglePin={togglePin} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-6">
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200">
